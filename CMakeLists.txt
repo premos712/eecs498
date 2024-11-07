@@ -1,70 +1,33 @@
-# Copyright (c) Open Enclave SDK contributors.
-# Licensed under the MIT License.
-
 cmake_minimum_required(VERSION 3.11)
-
-set(OE_INCLUDEDIR /opt/openenclave/include)
-
-if (LVI_MITIGATION MATCHES ControlFlow)
-  # Configure the cmake to use customized compilation toolchain.
-  # This package has to be added before `project()`.
-  find_package(OpenEnclave-LVI-Mitigation CONFIG REQUIRED)
-else ()
-  # Setting the cmake compiler when LVI mitigation is not enabled. If the CC
-  # environment variable has been specified or the if CMAKE_C_COMPILER cmake
-  # variable has been passed to cmake, use the C compiler that has been specified.
-  # Otherwise, prefer clang. Same for C++ compiler. This must be done before
-  # the `project` command.
-  if (UNIX)
-    if (NOT DEFINED ENV{CC} AND NOT DEFINED CMAKE_C_COMPILER)
-      find_program(CMAKE_C_COMPILER clang-11 clang-10 clang)
-    endif ()
-    if (NOT DEFINED ENV{CXX} AND NOT DEFINED CMAKE_CXX_COMPILER)
-      find_program(CMAKE_CXX_COMPILER clang++-11 clang++-10 clang++)
-    endif ()
-  endif ()
-endif ()
-
 project("Hello World Sample" LANGUAGES C CXX)
 
-# Currently the `OpenEnclave` package depends on `project()`.
+# 查找 Open Enclave SDK
 find_package(OpenEnclave CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 11)
-set(OE_CRYPTO_LIB
-    mbedtls
-    CACHE STRING "Crypto library used by enclaves.")
 
+# 添加子目录
 add_subdirectory(enclave)
 add_subdirectory(host)
 
-# Generate private and public keys in the build directory if they don't exist
-add_custom_command(
-  OUTPUT ${CMAKE_BINARY_DIR}/private.pem ${CMAKE_BINARY_DIR}/public.pem
-  COMMAND openssl genrsa -out ${CMAKE_BINARY_DIR}/private.pem -3 3072
-  COMMAND openssl rsa -in ${CMAKE_BINARY_DIR}/private.pem -pubout -out ${CMAKE_BINARY_DIR}/public.pem
-  COMMENT "Generating RSA private and public keys"
-)
-
-# Sign enclave using generated private.pem
+# 使用 OpenSSL 生成密钥并签名 enclave
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/enclave/enclave.signed
-  DEPENDS enclave enclave/helloworld.conf ${CMAKE_BINARY_DIR}/private.pem
+  COMMAND openssl genrsa -out ${CMAKE_BINARY_DIR}/private.pem -3 3072
   COMMAND openenclave::oesign sign -e $<TARGET_FILE:enclave>
           -c ${CMAKE_SOURCE_DIR}/enclave/helloworld.conf -k ${CMAKE_BINARY_DIR}/private.pem
-  COMMENT "Signing the enclave"
+  DEPENDS enclave enclave/helloworld.conf
+  COMMENT "Generating key and signing the enclave"
 )
 
-# Create a custom target for signing the enclave
+# 自定义目标用于签名
 add_custom_target(sign_enclave ALL DEPENDS ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
 
-# Add run and simulate targets
-if ((NOT DEFINED ENV{OE_SIMULATION}) OR (NOT $ENV{OE_SIMULATION}))
-  add_custom_target(
-    run
-    DEPENDS helloworld_host sign_enclave
-    COMMAND helloworld_host ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
-endif ()
+# 添加运行和模拟目标
+add_custom_target(
+  run
+  DEPENDS helloworld_host sign_enclave
+  COMMAND helloworld_host ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
 
 add_custom_target(
   simulate
