@@ -1,0 +1,11 @@
+/home/fdai/my_oe_helloworld/build/CMakeFiles/rebuild_cache.dir
+/home/fdai/my_oe_helloworld/build/CMakeFiles/simulate.dir
+/home/fdai/my_oe_helloworld/build/CMakeFiles/edit_cache.dir
+/home/fdai/my_oe_helloworld/build/CMakeFiles/sign.dir
+/home/fdai/my_oe_helloworld/build/CMakeFiles/run.dir
+/home/fdai/my_oe_helloworld/build/enclave/CMakeFiles/rebuild_cache.dir
+/home/fdai/my_oe_helloworld/build/enclave/CMakeFiles/enclave.dir
+/home/fdai/my_oe_helloworld/build/enclave/CMakeFiles/edit_cache.dir
+/home/fdai/my_oe_helloworld/build/host/CMakeFiles/rebuild_cache.dir
+/home/fdai/my_oe_helloworld/build/host/CMakeFiles/helloworld_host.dir
+/home/fdai/my_oe_helloworld/build/host/CMakeFiles/edit_cache.dir
