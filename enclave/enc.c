@@ -31,3 +31,17 @@ void enclave_helloworld()
             oe_result_str(result));
     }
 }
+
+void ecall_print_array(int* arr, size_t size) {
+    char buffer[256];
+    int offset = 0;
+
+    // 将数组内容转换为字符串
+    offset += snprintf(buffer + offset, sizeof(buffer) - offset, "Array elements: ");
+    for (size_t i = 0; i < size && offset < sizeof(buffer); ++i) {
+        offset += snprintf(buffer + offset, sizeof(buffer) - offset, "%d ", arr[i]);
+    }
+
+    ocall_print(buffer);  // 使用 OCall 打印数组内容
+}
+
