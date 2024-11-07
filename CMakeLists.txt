@@ -38,29 +38,35 @@ set(OE_CRYPTO_LIB
 add_subdirectory(enclave)
 add_subdirectory(host)
 
-# Generate key
+# Generate private and public keys in the build directory if they don't exist
 add_custom_command(
-  OUTPUT private.pem public.pem
-  COMMAND openssl genrsa -out private.pem -3 3072
-  COMMAND openssl rsa -in private.pem -pubout -out public.pem)
+  OUTPUT ${CMAKE_BINARY_DIR}/private.pem ${CMAKE_BINARY_DIR}/public.pem
+  COMMAND openssl genrsa -out ${CMAKE_BINARY_DIR}/private.pem -3 3072
+  COMMAND openssl rsa -in ${CMAKE_BINARY_DIR}/private.pem -pubout -out ${CMAKE_BINARY_DIR}/public.pem
+  COMMENT "Generating RSA private and public keys"
+)
 
-# Sign enclave
+# Sign enclave using generated private.pem
 add_custom_command(
-  OUTPUT enclave/enclave.signed
-  DEPENDS enclave enclave/helloworld.conf private.pem public.pem
-  COMMAND openenclave::oesign sign -e $<TARGET_FILE:enclave> -c
-          ${CMAKE_SOURCE_DIR}/enclave/helloworld.conf -k private.pem)
+  OUTPUT ${CMAKE_BINARY_DIR}/enclave/enclave.signed
+  DEPENDS enclave enclave/helloworld.conf ${CMAKE_BINARY_DIR}/private.pem
+  COMMAND openenclave::oesign sign -e $<TARGET_FILE:enclave>
+          -c ${CMAKE_SOURCE_DIR}/enclave/helloworld.conf -k ${CMAKE_BINARY_DIR}/private.pem
+  COMMENT "Signing the enclave"
+)
 
-add_custom_target(sign ALL DEPENDS enclave/enclave.signed)
+# Create a custom target for signing the enclave
+add_custom_target(sign_enclave ALL DEPENDS ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
 
+# Add run and simulate targets
 if ((NOT DEFINED ENV{OE_SIMULATION}) OR (NOT $ENV{OE_SIMULATION}))
   add_custom_target(
     run
-    DEPENDS helloworld_host sign
+    DEPENDS helloworld_host sign_enclave
     COMMAND helloworld_host ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
 endif ()
 
 add_custom_target(
   simulate
-  DEPENDS helloworld_host sign
+  DEPENDS helloworld_host sign_enclave
   COMMAND helloworld_host ${CMAKE_BINARY_DIR}/enclave/enclave.signed --simulate)
