@@ -26,5 +26,3 @@ add_custom_command(
             -c ${CMAKE_SOURCE_DIR}/enclave/helloworld.conf -k private.pem
 )
 
-# 创建一个自定义目标，将签名后的文件加入构建流程
-add_custom_target(sign_enclave ALL DEPENDS ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
