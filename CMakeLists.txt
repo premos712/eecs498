@@ -5,6 +5,7 @@ project("Hello World Sample" LANGUAGES C CXX)
 find_package(OpenEnclave CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 11)
+set(OE_CRYPTO_LIB openssl) 
 
 # 添加子目录
 add_subdirectory(enclave)
