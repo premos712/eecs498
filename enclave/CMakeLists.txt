@@ -6,8 +6,8 @@ add_custom_command(
             --search-path ${OE_INCLUDEDIR} --search-path ${OE_INCLUDEDIR}/openenclave/edl/sgx
 )
 
-# 添加生成的文件和其他源文件构建静态库
-add_library(enclave STATIC enc.c helloworld_t.c)
+# 添加生成的文件和其他源文件构建共享库
+add_library(enclave SHARED enc.c helloworld_t.c)
 
 # 包含生成文件的路径
 target_include_directories(enclave PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
