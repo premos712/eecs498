@@ -11,8 +11,7 @@ enclave {
     };
 
     untrusted {
-       void ocall_print(const char* str);
+        void ocall_print(const char* str);
+        void host_helloworld(); 
     };
 };
-
-
