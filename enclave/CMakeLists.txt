@@ -21,8 +21,7 @@ target_link_libraries(enclave openenclave::oeenclave openenclave::oecrypto${OE_C
 # 配置签名命令
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/enclave/enclave.signed
-    DEPENDS enclave private.pem public.pem
+    DEPENDS enclave private.pem
     COMMAND /opt/openenclave/bin/oesign sign -e $<TARGET_FILE:enclave>
             -c ${CMAKE_SOURCE_DIR}/enclave/helloworld.conf -k private.pem
 )
-
