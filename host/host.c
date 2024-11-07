@@ -7,7 +7,9 @@
 void ocall_print(const char* str) {
     printf("%s\n", str);
 }
-
+void host_helloworld() {
+    printf("Hello from the host!\n");
+}
 int main(int argc, const char* argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s enclave_image_path\n", argv[0]);
