@@ -47,7 +47,7 @@ add_custom_command(
 # Sign enclave
 add_custom_command(
   OUTPUT enclave/enclave.signed
-  DEPENDS enclave enclave/helloworld.conf private.pem
+  DEPENDS enclave enclave/helloworld.conf private.pem public.pem
   COMMAND openenclave::oesign sign -e $<TARGET_FILE:enclave> -c
           ${CMAKE_SOURCE_DIR}/enclave/helloworld.conf -k private.pem)
 
